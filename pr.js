@@ -2,11 +2,10 @@ let request;
 
 /**
  * Initializes the payment request object.
- * @return {PaymentRequest|null} The payment request object or null if PaymentRequest is not supported.
+ * @return {PaymentRequest} The payment request object.
  */
 function buildPaymentRequest() {
     if (!window.PaymentRequest) {
-        console.error("PaymentRequest API is not supported.");
         return null;
     }
 
@@ -57,7 +56,6 @@ function onCheckoutClick() {
 
 /**
  * Handles the response from PaymentRequest.show().
- * @param {PaymentResponse} response The payment response object.
  */
 function handlePaymentResponse(response) {
     const payloadForFetch = {}; // Define payload based on your needs
@@ -88,7 +86,6 @@ function handlePaymentResponse(response) {
  */
 function onPayByPhonePeClick() {
     if (!window.PaymentRequest || !request) {
-        console.error("PaymentRequest or request not initialized.");
         return;
     }
 
@@ -118,3 +115,51 @@ function onPayByPhonePeClick() {
 function handleError(error) {
     console.error('Payment error:', error);
 }
+
+/**
+ * Fetch payment details based on the provided transaction ID.
+ * @param {string} transactionId The transaction ID to look up.
+ */
+function fetchPaymentDetails(transactionId) {
+    const fetchOptions = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    };
+    const endpoint = `secure/payment/details/${transactionId}`; // Update with your actual endpoint
+
+    fetch(endpoint, fetchOptions).then(response => {
+        if (response.ok) {
+            return response.json();
+        } else {
+            throw new Error('Failed to fetch payment details');
+        }
+    }).then(data => {
+        displayPaymentDetails(data);
+    }).catch(error => {
+        document.getElementById('details-output').textContent = 'Error: ' + error.message;
+    });
+}
+
+/**
+ * Displays payment details on the page.
+ * @param {Object} data The payment details data.
+ */
+function displayPaymentDetails(data) {
+    const output = document.getElementById('details-output');
+    if (data.success) {
+        output.textContent = JSON.stringify(data, null, 2);
+    } else {
+        output.textContent = 'Error: ' + data.message;
+    }
+}
+
+// Handle form submission to fetch payment details
+document.getElementById('transaction-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const transactionId = document.getElementById('transactionId').value.trim();
+    if (transactionId) {
+        fetchPaymentDetails(transactionId);
+    }
+});
