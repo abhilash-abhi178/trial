@@ -12,8 +12,18 @@
     <h1>PhonePe mIntent</h1>
     <p>This merchant accepts PhonePe only.</p>
     <p><button style="font-weight: bolder;" onclick="onCheckoutClick()">PhonePe Pay</button></p>
+    <hr>
+    <h2>Check Payment Status</h2>
+    <form id="transaction-form">
+      <label for="transactionId">Enter Transaction ID:</label>
+      <input type="text" id="transactionId" name="transactionId" required>
+      <button type="submit">Get Payment Details</button>
+    </form>
+    <div id="payment-details">
+      <h3>Payment Details</h3>
+      <pre id="details-output"></pre>
+    </div>
   </div>
-  <pre id="msg"></pre>
   <script src="pr.js"></script>
 </body>
 </html>
